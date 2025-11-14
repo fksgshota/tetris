@@ -234,32 +234,37 @@ header h1 {
 
 .mobile-controls {
     display: none;
-    margin-top: 15px;
-    justify-content: center;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
 }
 
 .mobile-row {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 15px;
+    margin-bottom: 15px;
 }
 
 .mobile-btn {
     width: 70px;
     height: 70px;
-    background: white;
+    background: rgba(255, 255, 255, 0.85);
     border: 3px solid #667eea;
-    border-radius: 10px;
+    border-radius: 15px;
     font-size: 1.5rem;
     font-weight: bold;
     color: #667eea;
     cursor: pointer;
     transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
 }
 
 .mobile-btn:active {
-    background: #667eea;
+    background: rgba(102, 126, 234, 0.9);
     color: white;
     transform: scale(0.95);
 }
@@ -303,8 +308,15 @@ footer {
     }
 
     #game-canvas {
-        width: 300px;
-        height: 600px;
+        width: 100%;
+        max-width: 450px;
+        height: auto;
+        aspect-ratio: 1 / 2;
+    }
+
+    .game-board-container {
+        width: 100%;
+        max-width: 450px;
     }
 
     .mobile-controls {
@@ -330,8 +342,8 @@ footer {
     }
 
     #game-canvas {
-        width: 200px;
-        height: 400px;
+        width: 100%;
+        max-width: 100%;
     }
 
     .side-panel {
@@ -339,8 +351,13 @@ footer {
     }
 
     .mobile-btn {
-        width: 60px;
-        height: 60px;
-        font-size: 1.2rem;
+        width: 65px;
+        height: 65px;
+        font-size: 1.3rem;
+    }
+
+    .mobile-row {
+        gap: 12px;
+        margin-bottom: 12px;
     }
 }

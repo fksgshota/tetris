@@ -33,6 +33,22 @@
             <!-- 中央: ゲーム画面 -->
             <div class="game-board-container">
                 <canvas id="game-canvas" width="450" height="900"></canvas>
+                
+                <!-- モバイル用コントロール -->
+                <div class="mobile-controls">
+                    <div class="mobile-row">
+                        <button class="mobile-btn" id="mobile-rotate">↻</button>
+                    </div>
+                    <div class="mobile-row">
+                        <button class="mobile-btn" id="mobile-left">←</button>
+                        <button class="mobile-btn" id="mobile-down">↓</button>
+                        <button class="mobile-btn" id="mobile-right">→</button>
+                    </div>
+                    <div class="mobile-row">
+                        <button class="mobile-btn" id="mobile-drop">Drop</button>
+                    </div>
+                </div>
+                
                 <div id="game-over-overlay" class="game-over-overlay hidden">
                     <div class="game-over-content">
                         <h2>ゲームオーバー</h2>
@@ -90,23 +106,8 @@
             </div>
         </div>
 
-        <!-- モバイル用コントロール -->
-        <div class="mobile-controls">
-            <div class="mobile-row">
-                <button class="mobile-btn" id="mobile-rotate">↻</button>
-            </div>
-            <div class="mobile-row">
-                <button class="mobile-btn" id="mobile-left">←</button>
-                <button class="mobile-btn" id="mobile-down">↓</button>
-                <button class="mobile-btn" id="mobile-right">→</button>
-            </div>
-            <div class="mobile-row">
-                <button class="mobile-btn" id="mobile-drop">Drop</button>
-            </div>
-        </div>
-
         <footer>
-            <p>キーボードまたは画面下のボタンで操作できます</p>
+            <p>キーボードまたは画面上のボタンで操作できます</p>
         </footer>
     </div>
 
