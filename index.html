@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 Tetris</h1>
+        </header>
+        
+        <div class="game-container">
+            <!-- 左側: 次のブロック表示 -->
+            <div class="side-panel left-panel">
+                <div class="panel-section">
+                    <h3>次のブロック</h3>
+                    <canvas id="next-canvas" width="120" height="120"></canvas>
+                </div>
+                <div class="panel-section">
+                    <h3>操作方法</h3>
+                    <div class="controls-help">
+                        <p>← → : 移動</p>
+                        <p>↑ : 回転</p>
+                        <p>↓ : 高速落下</p>
+                        <p>Space : 即座に落下</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 中央: ゲーム画面 -->
+            <div class="game-board-container">
+                <canvas id="game-canvas" width="300" height="600"></canvas>
+                <div id="game-over-overlay" class="game-over-overlay hidden">
+                    <div class="game-over-content">
+                        <h2>ゲームオーバー</h2>
+                        <p>スコア: <span id="final-score">0</span></p>
+                        <button id="restart-btn" class="btn">もう一度プレイ</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右側: スコア・設定 -->
+            <div class="side-panel right-panel">
+                <div class="panel-section">
+                    <h3>スコア</h3>
+                    <div class="score-display">
+                        <p class="score-label">現在</p>
+                        <p class="score-value" id="score">0</p>
+                    </div>
+                    <div class="score-display">
+                        <p class="score-label">ハイスコア</p>
+                        <p class="score-value" id="high-score">0</p>
+                    </div>
+                    <div class="level-display">
+                        <p class="score-label">レベル</p>
+                        <p class="score-value" id="level">1</p>
+                    </div>
+                    <div class="lines-display">
+                        <p class="score-label">ライン</p>
+                        <p class="score-value" id="lines">0</p>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>ゲーム設定</h3>
+                    <div class="difficulty-selector">
+                        <label for="difficulty">難易度:</label>
+                        <select id="difficulty">
+                            <option value="easy">簡単</option>
+                            <option value="normal" selected>普通</option>
+                            <option value="hard">難しい</option>
+                        </select>
+                    </div>
+                    <div class="sound-toggle">
+                        <label>
+                            <input type="checkbox" id="sound-toggle" checked>
+                            サウンドON
+                        </label>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <button id="start-btn" class="btn btn-primary">スタート</button>
+                    <button id="pause-btn" class="btn" disabled>一時停止</button>
+                    <button id="reset-btn" class="btn">リセット</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- モバイル用コントロール -->
+        <div class="mobile-controls">
+            <div class="mobile-row">
+                <button class="mobile-btn" id="mobile-rotate">↻</button>
+            </div>
+            <div class="mobile-row">
+                <button class="mobile-btn" id="mobile-left">←</button>
+                <button class="mobile-btn" id="mobile-down">↓</button>
+                <button class="mobile-btn" id="mobile-right">→</button>
+            </div>
+            <div class="mobile-row">
+                <button class="mobile-btn" id="mobile-drop">Drop</button>
+            </div>
+        </div>
+
+        <footer>
+            <p>キーボードまたは画面下のボタンで操作できます</p>
+        </footer>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
