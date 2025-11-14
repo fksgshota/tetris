@@ -66,6 +66,26 @@ header h1 {
     max-width: 400px;
 }
 
+.mobile-menu-toggle {
+    display: none;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.mobile-menu-toggle:active {
+    transform: scale(0.98);
+}
+
 .panel-section {
     margin-bottom: 25px;
 }
@@ -340,9 +360,25 @@ footer {
         max-width: 450px;
     }
 
-    /* 右パネル（スコア、設定、ボタン）は非表示 */
+    /* 右パネル（スコア、設定、ボタン）を折り畳み式に */
     .right-panel {
+        order: 2;
+        display: block;
+        width: 100%;
+        max-width: 450px;
+        padding: 15px;
+    }
+
+    .mobile-menu-toggle {
+        display: block;
+    }
+
+    .right-panel .panel-section {
         display: none;
+    }
+
+    .right-panel.menu-open .panel-section {
+        display: block;
     }
 
     .left-panel .panel-section:not(:first-child) {

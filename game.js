@@ -629,6 +629,16 @@ mobileDrop.addEventListener('click', () => {
     }
 });
 
+// モバイルメニュートグル
+const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+if (mobileMenuToggle) {
+    mobileMenuToggle.addEventListener('click', () => {
+        const rightPanel = document.querySelector('.right-panel');
+        rightPanel.classList.toggle('menu-open');
+        mobileMenuToggle.textContent = rightPanel.classList.contains('menu-open') ? '✕ 閉じる' : '☰ メニュー';
+    });
+}
+
 // 初期化
 init();
 drawBoard();
