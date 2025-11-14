@@ -1,7 +1,16 @@
-// ゲーム定数
+// ===================================
+// 定数定義
+// ===================================
 const COLS = 10;
 const ROWS = 20;
 const BLOCK_SIZE = 45;
+const INITIAL_DROP_SPEED = 1000;
+const LEVEL_SPEED_DECREASE = 100;
+const MIN_DROP_SPEED = 100;
+const POINTS_PER_LINE = 100;
+const LINES_PER_LEVEL = 10;
+const HIGH_SCORE_KEY = 'tetris-high-score';
+
 const COLORS = [
     '#000000', // 空
     '#FF0D72', // I
@@ -25,7 +34,9 @@ const SHAPES = [
     [[1, 1, 0], [0, 1, 1]]  // Z
 ];
 
-// ゲーム状態
+// ===================================
+// ゲーム状態管理
+// ===================================
 let board = [];
 let currentPiece = null;
 let nextPiece = null;
@@ -35,9 +46,12 @@ let level = 1;
 let gameRunning = false;
 let gamePaused = false;
 let gameInterval = null;
-let dropSpeed = 1000;
+let dropSpeed = INITIAL_DROP_SPEED;
 let soundEnabled = true;
 
+// ===================================
+// DOM要素の取得
+// ===================================
 // Canvas要素
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
@@ -67,7 +81,13 @@ const mobileDown = document.getElementById('mobile-down');
 const mobileRotate = document.getElementById('mobile-rotate');
 const mobileDrop = document.getElementById('mobile-drop');
 
-// ゲーム初期化
+// ===================================
+// 初期化・セットアップ
+// ===================================
+
+/**
+ * ゲームを初期化
+ */
 function init() {
     board = Array(ROWS).fill().map(() => Array(COLS).fill(0));
     score = 0;
@@ -78,7 +98,13 @@ function init() {
     setDifficulty();
 }
 
-// ボードを描画
+// ===================================
+// 描画関数
+// ===================================
+
+/**
+ * ゲームボードを描画
+ */
 function drawBoard() {
     ctx.fillStyle = '#1a1a2e';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -92,25 +118,38 @@ function drawBoard() {
     }
 }
 
-// ブロックを描画
+/**
+ * 個別のブロックを描画
+ * @param {CanvasRenderingContext2D} context - 描画コンテキスト
+ * @param {number} x - X座標
+ * @param {number} y - Y座標
+ * @param {number} colorIndex - 色のインデックス
+ */
 function drawBlock(context, x, y, colorIndex) {
     const px = x * BLOCK_SIZE;
     const py = y * BLOCK_SIZE;
-    
+
     context.fillStyle = COLORS[colorIndex];
     context.fillRect(px, py, BLOCK_SIZE, BLOCK_SIZE);
-    
+
     // ブロックの境界線
     context.strokeStyle = 'rgba(0, 0, 0, 0.3)';
     context.lineWidth = 2;
     context.strokeRect(px, py, BLOCK_SIZE, BLOCK_SIZE);
-    
+
     // ハイライト効果
     context.fillStyle = 'rgba(255, 255, 255, 0.2)';
     context.fillRect(px, py, BLOCK_SIZE / 2, BLOCK_SIZE / 2);
 }
 
-// 新しいピースを生成
+// ===================================
+// テトリミノ生成・管理
+// ===================================
+
+/**
+ * 新しいテトリミノを生成
+ * @returns {Object} テトリミノオブジェクト
+ */
 function createPiece() {
     const typeId = Math.floor(Math.random() * 7) + 1;
     const shape = SHAPES[typeId];
@@ -126,21 +165,21 @@ function createPiece() {
 function drawNextPiece() {
     nextCtx.fillStyle = '#1a1a2e';
     nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
-    
+
     if (!nextPiece) return;
-    
+
     const offsetX = (nextCanvas.width - nextPiece.shape[0].length * BLOCK_SIZE) / 2;
     const offsetY = (nextCanvas.height - nextPiece.shape.length * BLOCK_SIZE) / 2;
-    
+
     for (let row = 0; row < nextPiece.shape.length; row++) {
         for (let col = 0; col < nextPiece.shape[row].length; col++) {
             if (nextPiece.shape[row][col]) {
                 const px = offsetX + col * BLOCK_SIZE;
                 const py = offsetY + row * BLOCK_SIZE;
-                
+
                 nextCtx.fillStyle = COLORS[nextPiece.color];
                 nextCtx.fillRect(px, py, BLOCK_SIZE, BLOCK_SIZE);
-                
+
                 nextCtx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
                 nextCtx.lineWidth = 2;
                 nextCtx.strokeRect(px, py, BLOCK_SIZE, BLOCK_SIZE);
@@ -152,38 +191,38 @@ function drawNextPiece() {
 // ゴーストピースの位置を計算
 function getGhostPieceY() {
     if (!currentPiece) return 0;
-    
+
     let ghostY = currentPiece.y;
     const ghostPiece = { ...currentPiece, y: ghostY };
-    
+
     while (!isCollision(ghostPiece, 0, 1)) {
         ghostY++;
         ghostPiece.y = ghostY;
     }
-    
+
     return ghostY;
 }
 
 // ゴーストピースを描画
 function drawGhostPiece() {
     if (!currentPiece) return;
-    
+
     const ghostY = getGhostPieceY();
-    
+
     // 現在のピースと同じ位置なら描画しない
     if (ghostY === currentPiece.y) return;
-    
+
     for (let row = 0; row < currentPiece.shape.length; row++) {
         for (let col = 0; col < currentPiece.shape[row].length; col++) {
             if (currentPiece.shape[row][col]) {
                 const px = (currentPiece.x + col) * BLOCK_SIZE;
                 const py = (ghostY + row) * BLOCK_SIZE;
-                
+
                 // 半透明の影として描画
                 ctx.fillStyle = COLORS[currentPiece.color];
                 ctx.globalAlpha = 0.2;
                 ctx.fillRect(px, py, BLOCK_SIZE, BLOCK_SIZE);
-                
+
                 // 点線の境界線
                 ctx.globalAlpha = 0.5;
                 ctx.strokeStyle = COLORS[currentPiece.color];
@@ -200,7 +239,7 @@ function drawGhostPiece() {
 // 現在のピースを描画
 function drawPiece() {
     if (!currentPiece) return;
-    
+
     for (let row = 0; row < currentPiece.shape.length; row++) {
         for (let col = 0; col < currentPiece.shape[row].length; col++) {
             if (currentPiece.shape[row][col]) {
@@ -217,11 +256,11 @@ function isCollision(piece, offsetX = 0, offsetY = 0) {
             if (piece.shape[row][col]) {
                 const newX = piece.x + col + offsetX;
                 const newY = piece.y + row + offsetY;
-                
+
                 if (newX < 0 || newX >= COLS || newY >= ROWS) {
                     return true;
                 }
-                
+
                 if (newY >= 0 && board[newY][newX]) {
                     return true;
                 }
@@ -257,7 +296,7 @@ function rotate(piece) {
 // ラインをクリア
 function clearLines() {
     let linesCleared = 0;
-    
+
     for (let row = ROWS - 1; row >= 0; row--) {
         if (board[row].every(cell => cell !== 0)) {
             board.splice(row, 1);
@@ -266,14 +305,14 @@ function clearLines() {
             row++; // 同じ行を再チェック
         }
     }
-    
+
     if (linesCleared > 0) {
         lines += linesCleared;
         score += linesCleared * 100 * level;
         level = Math.floor(lines / 10) + 1;
         updateScore();
         playSound('clear');
-        
+
         // レベルアップで速度上昇
         updateGameSpeed();
     }
@@ -348,9 +387,9 @@ function spawnNewPiece() {
         currentPiece = nextPiece;
         nextPiece = createPiece();
     }
-    
+
     drawNextPiece();
-    
+
     if (isCollision(currentPiece)) {
         gameOver();
     }
@@ -407,21 +446,21 @@ function setDifficulty() {
 // 効果音再生 (Web Audio APIを使用したかっこいい音)
 function playSound(type) {
     if (!soundEnabled) return;
-    
+
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    
+
     switch (type) {
         case 'move':
             // シンプルなクリック音
             playTone(audioContext, 800, 0.03, 0.08, 'sine');
             break;
-            
+
         case 'rotate':
             // 二重音の回転音
             playTone(audioContext, 600, 0.05, 0.1, 'square');
             setTimeout(() => playTone(audioContext, 900, 0.04, 0.08, 'square'), 30);
             break;
-            
+
         case 'drop':
             // よりインパクトのある着地音
             playTone(audioContext, 80, 0.2, 0.08, 'sawtooth');
@@ -429,7 +468,7 @@ function playSound(type) {
             // 余韻の音
             setTimeout(() => playTone(audioContext, 200, 0.08, 0.15, 'sine'), 60);
             break;
-            
+
         case 'clear':
             // 華やかなライン消去音（上昇音階）
             const clearNotes = [523, 659, 784, 1047]; // C, E, G, C (上のオクターブ)
@@ -437,7 +476,7 @@ function playSound(type) {
                 setTimeout(() => playTone(audioContext, freq, 0.15, 0.08, 'sine'), i * 50);
             });
             break;
-            
+
         case 'gameover':
             // ドラマチックな下降音
             const gameOverNotes = [523, 494, 440, 392, 349, 294, 262]; // C→C (下降)
@@ -452,18 +491,18 @@ function playSound(type) {
 function playTone(audioContext, frequency, volume, duration, waveType = 'sine') {
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
-    
+
     oscillator.type = waveType;
     oscillator.frequency.value = frequency;
-    
+
     // エンベロープ（音量の時間変化）
     gainNode.gain.setValueAtTime(0, audioContext.currentTime);
     gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.01);
     gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-    
+
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
-    
+
     oscillator.start(audioContext.currentTime);
     oscillator.stop(audioContext.currentTime + duration);
 }
@@ -471,7 +510,7 @@ function playTone(audioContext, frequency, volume, duration, waveType = 'sine') 
 // ゲームループ
 function gameLoop() {
     if (!gameRunning || gamePaused) return;
-    
+
     moveDown();
     drawBoard();
     drawGhostPiece();
@@ -481,19 +520,19 @@ function gameLoop() {
 // ゲーム開始
 function startGame() {
     if (gameRunning && !gamePaused) return;
-    
+
     if (!gameRunning) {
         init();
         spawnNewPiece();
     }
-    
+
     gameRunning = true;
     gamePaused = false;
     gameOverOverlay.classList.add('hidden');
-    
+
     setDifficulty();
     gameInterval = setInterval(gameLoop, dropSpeed);
-    
+
     startBtn.disabled = true;
     pauseBtn.disabled = false;
     difficultySelect.disabled = true;
@@ -502,10 +541,10 @@ function startGame() {
 // ゲーム一時停止
 function pauseGame() {
     if (!gameRunning) return;
-    
+
     gamePaused = !gamePaused;
     pauseBtn.textContent = gamePaused ? '再開' : '一時停止';
-    
+
     if (!gamePaused) {
         gameInterval = setInterval(gameLoop, dropSpeed);
     } else {
@@ -518,15 +557,15 @@ function resetGame() {
     gameRunning = false;
     gamePaused = false;
     clearInterval(gameInterval);
-    
+
     init();
     drawBoard();
-    
+
     nextPiece = null;
     currentPiece = null;
     nextCtx.fillStyle = '#1a1a2e';
     nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
-    
+
     gameOverOverlay.classList.add('hidden');
     startBtn.disabled = false;
     pauseBtn.disabled = true;
@@ -537,7 +576,7 @@ function resetGame() {
 // キーボード操作
 document.addEventListener('keydown', (e) => {
     if (!gameRunning || gamePaused) return;
-    
+
     switch (e.key) {
         case 'ArrowLeft':
             e.preventDefault();
@@ -562,7 +601,7 @@ document.addEventListener('keydown', (e) => {
             hardDrop();
             break;
     }
-    
+
     drawBoard();
     drawGhostPiece();
     drawPiece();
