@@ -1,7 +1,7 @@
 // ゲーム定数
 const COLS = 10;
 const ROWS = 20;
-const BLOCK_SIZE = 40;
+const BLOCK_SIZE = 45;
 const COLORS = [
     '#000000', // 空
     '#FF0D72', // I
