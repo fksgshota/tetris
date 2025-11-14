@@ -340,37 +340,36 @@ footer {
         gap: 15px;
     }
 
-    #game-canvas {
-        width: 100%;
-        max-width: 450px;
-        max-height: calc(100vh - 120px);
-        height: auto;
-        aspect-ratio: 1 / 2;
-    }
-
+    /* ゲーム画面を最初に表示 */
     .game-board-container {
+        order: 1;
         width: 100%;
         max-width: 450px;
     }
 
-    .side-panel {
-        width: 100%;
-        max-width: 450px;
-    }
-
-    /* 左パネル（次のブロック）は表示 */
+    /* 次のブロックパネルを2番目に表示 */
     .left-panel {
+        order: 0;
         display: flex;
         padding: 15px;
+        width: 100%;
+        max-width: 450px;
+    }
+
+    /* 右パネル（スコア、設定、ボタン）は非表示 */
+    .right-panel {
+        display: none;
     }
 
     .left-panel .panel-section:not(:first-child) {
         display: none;
     }
 
-    /* 右パネル（スコア、設定、ボタン）は非表示 */
-    .right-panel {
-        display: none;
+    #game-canvas {
+        width: 100%;
+        max-width: 450px;
+        max-height: calc(100vh - 180px);
+        height: auto;
     }
 
     .mobile-controls {
