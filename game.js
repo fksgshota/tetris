@@ -149,6 +149,54 @@ function drawNextPiece() {
     }
 }
 
+// ゴーストピースの位置を計算
+function getGhostPieceY() {
+    if (!currentPiece) return 0;
+    
+    let ghostY = currentPiece.y;
+    const ghostPiece = { ...currentPiece, y: ghostY };
+    
+    while (!isCollision(ghostPiece, 0, 1)) {
+        ghostY++;
+        ghostPiece.y = ghostY;
+    }
+    
+    return ghostY;
+}
+
+// ゴーストピースを描画
+function drawGhostPiece() {
+    if (!currentPiece) return;
+    
+    const ghostY = getGhostPieceY();
+    
+    // 現在のピースと同じ位置なら描画しない
+    if (ghostY === currentPiece.y) return;
+    
+    for (let row = 0; row < currentPiece.shape.length; row++) {
+        for (let col = 0; col < currentPiece.shape[row].length; col++) {
+            if (currentPiece.shape[row][col]) {
+                const px = (currentPiece.x + col) * BLOCK_SIZE;
+                const py = (ghostY + row) * BLOCK_SIZE;
+                
+                // 半透明の影として描画
+                ctx.fillStyle = COLORS[currentPiece.color];
+                ctx.globalAlpha = 0.2;
+                ctx.fillRect(px, py, BLOCK_SIZE, BLOCK_SIZE);
+                
+                // 点線の境界線
+                ctx.globalAlpha = 0.5;
+                ctx.strokeStyle = COLORS[currentPiece.color];
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.strokeRect(px, py, BLOCK_SIZE, BLOCK_SIZE);
+                ctx.setLineDash([]);
+                ctx.globalAlpha = 1.0;
+            }
+        }
+    }
+}
+
 // 現在のピースを描画
 function drawPiece() {
     if (!currentPiece) return;
@@ -408,6 +456,7 @@ function gameLoop() {
     
     moveDown();
     drawBoard();
+    drawGhostPiece();
     drawPiece();
 }
 
@@ -497,6 +546,7 @@ document.addEventListener('keydown', (e) => {
     }
     
     drawBoard();
+    drawGhostPiece();
     drawPiece();
 });
 
@@ -518,6 +568,7 @@ mobileLeft.addEventListener('click', () => {
     if (gameRunning && !gamePaused) {
         moveLeft();
         drawBoard();
+        drawGhostPiece();
         drawPiece();
     }
 });
@@ -526,6 +577,7 @@ mobileRight.addEventListener('click', () => {
     if (gameRunning && !gamePaused) {
         moveRight();
         drawBoard();
+        drawGhostPiece();
         drawPiece();
     }
 });
@@ -536,6 +588,7 @@ mobileDown.addEventListener('click', () => {
         score += 1;
         updateScore();
         drawBoard();
+        drawGhostPiece();
         drawPiece();
     }
 });
@@ -544,6 +597,7 @@ mobileRotate.addEventListener('click', () => {
     if (gameRunning && !gamePaused) {
         rotatePiece();
         drawBoard();
+        drawGhostPiece();
         drawPiece();
     }
 });
@@ -552,6 +606,7 @@ mobileDrop.addEventListener('click', () => {
     if (gameRunning && !gamePaused) {
         hardDrop();
         drawBoard();
+        drawGhostPiece();
         drawPiece();
     }
 });
