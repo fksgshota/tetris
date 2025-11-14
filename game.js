@@ -404,50 +404,66 @@ function setDifficulty() {
     }
 }
 
-// 効果音再生 (Web Audio APIを使用した簡易的な音)
+// 効果音再生 (Web Audio APIを使用したかっこいい音)
 function playSound(type) {
     if (!soundEnabled) return;
     
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    
+    switch (type) {
+        case 'move':
+            // シンプルなクリック音
+            playTone(audioContext, 800, 0.03, 0.08, 'sine');
+            break;
+            
+        case 'rotate':
+            // 二重音の回転音
+            playTone(audioContext, 600, 0.05, 0.1, 'square');
+            setTimeout(() => playTone(audioContext, 900, 0.04, 0.08, 'square'), 30);
+            break;
+            
+        case 'drop':
+            // 力強い着地音
+            playTone(audioContext, 150, 0.15, 0.15, 'sawtooth');
+            setTimeout(() => playTone(audioContext, 100, 0.1, 0.1, 'triangle'), 50);
+            break;
+            
+        case 'clear':
+            // 華やかなライン消去音（上昇音階）
+            const clearNotes = [523, 659, 784, 1047]; // C, E, G, C (上のオクターブ)
+            clearNotes.forEach((freq, i) => {
+                setTimeout(() => playTone(audioContext, freq, 0.15, 0.08, 'sine'), i * 50);
+            });
+            break;
+            
+        case 'gameover':
+            // ドラマチックな下降音
+            const gameOverNotes = [523, 494, 440, 392, 349, 294, 262]; // C→C (下降)
+            gameOverNotes.forEach((freq, i) => {
+                setTimeout(() => playTone(audioContext, freq, 0.2, 0.15, 'triangle'), i * 80);
+            });
+            break;
+    }
+}
+
+// トーンを再生するヘルパー関数
+function playTone(audioContext, frequency, volume, duration, waveType = 'sine') {
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
+    
+    oscillator.type = waveType;
+    oscillator.frequency.value = frequency;
+    
+    // エンベロープ（音量の時間変化）
+    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+    gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.01);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
     
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
     
-    switch (type) {
-        case 'move':
-            oscillator.frequency.value = 200;
-            gainNode.gain.value = 0.1;
-            oscillator.start();
-            oscillator.stop(audioContext.currentTime + 0.05);
-            break;
-        case 'rotate':
-            oscillator.frequency.value = 300;
-            gainNode.gain.value = 0.1;
-            oscillator.start();
-            oscillator.stop(audioContext.currentTime + 0.05);
-            break;
-        case 'drop':
-            oscillator.frequency.value = 150;
-            gainNode.gain.value = 0.15;
-            oscillator.start();
-            oscillator.stop(audioContext.currentTime + 0.1);
-            break;
-        case 'clear':
-            oscillator.frequency.value = 500;
-            gainNode.gain.value = 0.2;
-            oscillator.start();
-            oscillator.stop(audioContext.currentTime + 0.2);
-            break;
-        case 'gameover':
-            oscillator.frequency.value = 100;
-            oscillator.type = 'sawtooth';
-            gainNode.gain.value = 0.3;
-            oscillator.start();
-            oscillator.stop(audioContext.currentTime + 0.5);
-            break;
-    }
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + duration);
 }
 
 // ゲームループ
