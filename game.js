@@ -423,9 +423,11 @@ function playSound(type) {
             break;
             
         case 'drop':
-            // 力強い着地音
-            playTone(audioContext, 150, 0.15, 0.15, 'sawtooth');
-            setTimeout(() => playTone(audioContext, 100, 0.1, 0.1, 'triangle'), 50);
+            // よりインパクトのある着地音
+            playTone(audioContext, 80, 0.2, 0.08, 'sawtooth');
+            setTimeout(() => playTone(audioContext, 60, 0.15, 0.12, 'triangle'), 40);
+            // 余韻の音
+            setTimeout(() => playTone(audioContext, 200, 0.08, 0.15, 'sine'), 60);
             break;
             
         case 'clear':
