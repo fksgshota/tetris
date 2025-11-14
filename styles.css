@@ -337,6 +337,7 @@ footer {
         max-height: none;
         flex-direction: column;
         align-items: center;
+        gap: 15px;
     }
 
     #game-canvas {
@@ -355,6 +356,21 @@ footer {
     .side-panel {
         width: 100%;
         max-width: 450px;
+    }
+
+    /* 左パネル（次のブロック）は表示 */
+    .left-panel {
+        display: flex;
+        padding: 15px;
+    }
+
+    .left-panel .panel-section:not(:first-child) {
+        display: none;
+    }
+
+    /* 右パネル（スコア、設定、ボタン）は非表示 */
+    .right-panel {
+        display: none;
     }
 
     .mobile-controls {
@@ -390,8 +406,18 @@ footer {
         max-height: calc(100vh - 100px);
     }
 
-    .side-panel {
-        padding: 15px;
+    .left-panel {
+        padding: 10px;
+    }
+
+    .left-panel h3 {
+        font-size: 1rem;
+        margin-bottom: 10px;
+    }
+
+    #next-canvas {
+        width: 120px;
+        height: 120px;
     }
 
     .mobile-btn {
