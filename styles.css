@@ -68,22 +68,26 @@ header h1 {
 
 .mobile-menu-toggle {
     display: none;
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    padding: 0;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
+    border-radius: 50%;
+    font-size: 1.5rem;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
+    z-index: 1001;
 }
 
 .mobile-menu-toggle:active {
-    transform: scale(0.98);
+    transform: scale(0.95);
 }
 
 .panel-section {
@@ -274,20 +278,20 @@ header h1 {
 .mobile-btn {
     width: 70px;
     height: 70px;
-    background: rgba(255, 255, 255, 0.85);
-    border: 3px solid #667eea;
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px solid rgba(102, 126, 234, 0.8);
     border-radius: 15px;
     font-size: 1.5rem;
     font-weight: bold;
-    color: #667eea;
+    color: rgba(102, 126, 234, 1);
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(3px);
 }
 
 .mobile-btn:active {
-    background: rgba(102, 126, 234, 0.9);
+    background: rgba(102, 126, 234, 0.7);
     color: white;
     transform: scale(0.95);
 }
@@ -360,13 +364,25 @@ footer {
         max-width: 450px;
     }
 
-    /* 右パネル（スコア、設定、ボタン）を折り畳み式に */
+    /* 右パネルをサイドメニューに */
     .right-panel {
-        order: 2;
-        display: block;
-        width: 100%;
-        max-width: 450px;
-        padding: 15px;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 85%;
+        max-width: 350px;
+        height: 100vh;
+        padding: 80px 20px 20px 20px;
+        background: white;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+        transition: right 0.3s ease;
+        z-index: 1000;
+        overflow-y: auto;
+        order: 3;
+    }
+
+    .right-panel.menu-open {
+        right: 0;
     }
 
     .mobile-menu-toggle {
@@ -374,10 +390,6 @@ footer {
     }
 
     .right-panel .panel-section {
-        display: none;
-    }
-
-    .right-panel.menu-open .panel-section {
         display: block;
     }
 

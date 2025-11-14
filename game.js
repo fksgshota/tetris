@@ -569,12 +569,19 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ボタンイベント
-startBtn.addEventListener('click', startGame);
+startBtn.addEventListener('click', () => {
+    startGame();
+    closeMobileMenu();
+});
 pauseBtn.addEventListener('click', pauseGame);
-resetBtn.addEventListener('click', resetGame);
+resetBtn.addEventListener('click', () => {
+    resetGame();
+    closeMobileMenu();
+});
 restartBtn.addEventListener('click', () => {
     resetGame();
     startGame();
+    closeMobileMenu();
 });
 
 soundToggle.addEventListener('change', (e) => {
@@ -635,10 +642,33 @@ if (mobileMenuToggle) {
     mobileMenuToggle.addEventListener('click', () => {
         const rightPanel = document.querySelector('.right-panel');
         rightPanel.classList.toggle('menu-open');
-        mobileMenuToggle.textContent = rightPanel.classList.contains('menu-open') ? '✕ 閉じる' : '☰ メニュー';
+        mobileMenuToggle.textContent = rightPanel.classList.contains('menu-open') ? '✕' : '☰';
     });
 }
 
-// 初期化
-init();
-drawBoard();
+// メニューを閉じる関数
+function closeMobileMenu() {
+    const rightPanel = document.querySelector('.right-panel');
+    if (rightPanel && rightPanel.classList.contains('menu-open')) {
+        rightPanel.classList.remove('menu-open');
+        if (mobileMenuToggle) {
+            mobileMenuToggle.textContent = '☰';
+        }
+    }
+}
+
+// ボタンイベント
+startBtn.addEventListener('click', () => {
+    startGame();
+    closeMobileMenu();
+});
+pauseBtn.addEventListener('click', pauseGame);
+resetBtn.addEventListener('click', () => {
+    resetGame();
+    closeMobileMenu();
+});
+restartBtn.addEventListener('click', () => {
+    resetGame();
+    startGame();
+    closeMobileMenu();
+});
