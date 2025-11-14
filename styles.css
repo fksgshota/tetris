@@ -334,7 +334,9 @@ footer {
     }
 
     .game-container {
-        max-height: calc(100vh - 100px);
+        max-height: none;
+        flex-direction: column;
+        align-items: center;
     }
 
     #game-canvas {
@@ -346,6 +348,11 @@ footer {
     }
 
     .game-board-container {
+        width: 100%;
+        max-width: 450px;
+    }
+
+    .side-panel {
         width: 100%;
         max-width: 450px;
     }
