@@ -53,6 +53,7 @@ let audioContext = null;
 let bgmOscillator = null;
 let bgmGainNode = null;
 let bgmNoteIndex = 0;
+let bgmTimeout = null;
 
 // BGMのメロディ（Tetrisテーマ - コロブチカ フルバージョン）
 const BGM_MELODY = [
@@ -735,7 +736,7 @@ function playNextBGMNote() {
     bgmNoteIndex = (bgmNoteIndex + 1) % BGM_MELODY.length;
 
     // 次の音符をスケジュール
-    setTimeout(() => {
+    bgmTimeout = setTimeout(() => {
         if (bgmEnabled && gameRunning && !gamePaused) {
             playNextBGMNote();
         }
@@ -746,6 +747,12 @@ function playNextBGMNote() {
  * BGMを停止
  */
 function stopBGM() {
+    // タイマーをクリア
+    if (bgmTimeout) {
+        clearTimeout(bgmTimeout);
+        bgmTimeout = null;
+    }
+
     if (bgmOscillator) {
         try {
             bgmOscillator.stop();
@@ -756,6 +763,14 @@ function stopBGM() {
     }
     if (bgmGainNode) {
         bgmGainNode = null;
+    }
+    if (audioContext) {
+        try {
+            audioContext.close();
+        } catch (e) {
+            // エラーを無視
+        }
+        audioContext = null;
     }
 }
 
@@ -801,7 +816,8 @@ function startGame() {
     pauseBtn.disabled = false;
     difficultySelect.disabled = true;
 
-    // BGMを開始
+    // BGMを開始（既存のBGMを停止してから開始）
+    stopBGM();
     if (bgmEnabled) {
         startBGM();
     }
@@ -816,7 +832,8 @@ function pauseGame() {
 
     if (!gamePaused) {
         gameInterval = setInterval(gameLoop, dropSpeed);
-        // 再開時にBGMも再開
+        // 再開時にBGMも再開（既存のBGMを停止してから開始）
+        stopBGM();
         if (bgmEnabled) {
             startBGM();
         }
