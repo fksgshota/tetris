@@ -36,7 +36,7 @@ header h1 {
 .game-container {
     display: flex;
     gap: 15px;
-    justify-content: space-between;
+    justify-content: center;
     align-items: flex-start;
     flex-wrap: nowrap;
     max-width: 100%;
