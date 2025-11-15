@@ -401,6 +401,8 @@ footer {
         transition: right 0.3s ease;
         z-index: 1000;
         overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
         order: 3;
     }
 
