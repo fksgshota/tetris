@@ -13,6 +13,7 @@ body {
     align-items: center;
     padding: 20px;
     box-sizing: border-box;
+    touch-action: manipulation;
 }
 
 .container {
@@ -288,6 +289,8 @@ header h1 {
     transition: all 0.2s ease;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(3px);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .mobile-btn:active {
