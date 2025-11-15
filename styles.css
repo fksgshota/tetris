@@ -49,6 +49,25 @@ header h1 {
     border-radius: 10px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     overflow: hidden;
+}
+
+/* モバイル用次のブロックプレビュー */
+.mobile-next-preview {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border-radius: 8px;
+    padding: 5px;
+    z-index: 10;
+}
+
+.mobile-next-preview canvas {
+    display: block;
+    width: 90px;
+    height: 90px;
+    opacity: 0.6;
     flex-shrink: 0;
 }
 
@@ -358,13 +377,14 @@ footer {
         max-width: 450px;
     }
 
-    /* 次のブロックパネルを2番目に表示 */
+    /* 次のブロックパネルを非表示に */
     .left-panel {
-        order: 0;
-        display: flex;
-        padding: 15px;
-        width: 100%;
-        max-width: 450px;
+        display: none;
+    }
+
+    /* モバイル用次のブロックプレビューを表示 */
+    .mobile-next-preview {
+        display: block;
     }
 
     /* 右パネルをサイドメニューに */

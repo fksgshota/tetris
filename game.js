@@ -206,6 +206,8 @@ const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
 const nextCanvas = document.getElementById('next-canvas');
 const nextCtx = nextCanvas.getContext('2d');
+const mobileNextCanvas = document.getElementById('mobile-next-canvas');
+const mobileNextCtx = mobileNextCanvas.getContext('2d');
 
 // ボタン要素
 const startBtn = document.getElementById('start-btn');
@@ -313,11 +315,17 @@ function createPiece() {
 
 // 次のピースを描画
 function drawNextPiece() {
+    // PC用の次のブロック表示
     nextCtx.fillStyle = '#1a1a2e';
     nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
 
+    // モバイル用の次のブロック表示
+    mobileNextCtx.fillStyle = '#1a1a2e';
+    mobileNextCtx.fillRect(0, 0, mobileNextCanvas.width, mobileNextCanvas.height);
+
     if (!nextPiece) return;
 
+    // PC用の描画
     const offsetX = (nextCanvas.width - nextPiece.shape[0].length * BLOCK_SIZE) / 2;
     const offsetY = (nextCanvas.height - nextPiece.shape.length * BLOCK_SIZE) / 2;
 
@@ -333,6 +341,27 @@ function drawNextPiece() {
                 nextCtx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
                 nextCtx.lineWidth = 2;
                 nextCtx.strokeRect(px, py, BLOCK_SIZE, BLOCK_SIZE);
+            }
+        }
+    }
+
+    // モバイル用の描画（小さいサイズ）
+    const mobileBlockSize = 20; // モバイル用のブロックサイズ
+    const mobileOffsetX = (mobileNextCanvas.width - nextPiece.shape[0].length * mobileBlockSize) / 2;
+    const mobileOffsetY = (mobileNextCanvas.height - nextPiece.shape.length * mobileBlockSize) / 2;
+
+    for (let row = 0; row < nextPiece.shape.length; row++) {
+        for (let col = 0; col < nextPiece.shape[row].length; col++) {
+            if (nextPiece.shape[row][col]) {
+                const px = mobileOffsetX + col * mobileBlockSize;
+                const py = mobileOffsetY + row * mobileBlockSize;
+
+                mobileNextCtx.fillStyle = COLORS[nextPiece.color];
+                mobileNextCtx.fillRect(px, py, mobileBlockSize, mobileBlockSize);
+
+                mobileNextCtx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+                mobileNextCtx.lineWidth = 1;
+                mobileNextCtx.strokeRect(px, py, mobileBlockSize, mobileBlockSize);
             }
         }
     }
