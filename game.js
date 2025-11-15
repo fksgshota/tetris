@@ -48,6 +48,155 @@ let gamePaused = false;
 let gameInterval = null;
 let dropSpeed = INITIAL_DROP_SPEED;
 let soundEnabled = true;
+let bgmEnabled = true;
+let audioContext = null;
+let bgmOscillator = null;
+let bgmGainNode = null;
+let bgmNoteIndex = 0;
+
+// BGMのメロディ（Tetrisテーマ - コロブチカ フルバージョン）
+const BGM_MELODY = [
+    // イントロ/メインテーマ（パートA）
+    { note: 659.25, duration: 0.4 },  // E
+    { note: 493.88, duration: 0.2 },  // B
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 587.33, duration: 0.4 },  // D
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 493.88, duration: 0.2 },  // B
+    { note: 440.00, duration: 0.4 },  // A
+    { note: 440.00, duration: 0.2 },  // A
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 659.25, duration: 0.4 },  // E
+    { note: 587.33, duration: 0.2 },  // D
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 493.88, duration: 0.6 },  // B
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 587.33, duration: 0.4 },  // D
+    { note: 659.25, duration: 0.4 },  // E
+    { note: 523.25, duration: 0.4 },  // C
+    { note: 440.00, duration: 0.4 },  // A
+    { note: 440.00, duration: 0.4 },  // A
+    { note: 0,      duration: 0.2 },  // 休符
+
+    // パートB（ブリッジ）
+    { note: 587.33, duration: 0.6 },  // D
+    { note: 698.46, duration: 0.2 },  // F#
+    { note: 880.00, duration: 0.4 },  // A
+    { note: 783.99, duration: 0.2 },  // G
+    { note: 698.46, duration: 0.2 },  // F#
+    { note: 659.25, duration: 0.6 },  // E
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 659.25, duration: 0.4 },  // E
+    { note: 587.33, duration: 0.2 },  // D
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 493.88, duration: 0.4 },  // B
+    { note: 493.88, duration: 0.2 },  // B
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 587.33, duration: 0.4 },  // D
+    { note: 659.25, duration: 0.4 },  // E
+    { note: 523.25, duration: 0.4 },  // C
+    { note: 440.00, duration: 0.4 },  // A
+    { note: 440.00, duration: 0.4 },  // A
+    { note: 0,      duration: 0.2 },  // 休符
+
+    // パートC（再びメインテーマ）
+    { note: 659.25, duration: 0.4 },  // E
+    { note: 493.88, duration: 0.2 },  // B
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 587.33, duration: 0.4 },  // D
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 493.88, duration: 0.2 },  // B
+    { note: 440.00, duration: 0.4 },  // A
+    { note: 440.00, duration: 0.2 },  // A
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 659.25, duration: 0.4 },  // E
+    { note: 587.33, duration: 0.2 },  // D
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 493.88, duration: 0.6 },  // B
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 587.33, duration: 0.4 },  // D
+    { note: 659.25, duration: 0.4 },  // E
+    { note: 523.25, duration: 0.4 },  // C
+    { note: 440.00, duration: 0.4 },  // A
+    { note: 440.00, duration: 0.4 },  // A
+    { note: 0,      duration: 0.2 },  // 休符
+
+    // パートD（ブリッジ2回目）
+    { note: 587.33, duration: 0.6 },  // D
+    { note: 698.46, duration: 0.2 },  // F#
+    { note: 880.00, duration: 0.4 },  // A
+    { note: 783.99, duration: 0.2 },  // G
+    { note: 698.46, duration: 0.2 },  // F#
+    { note: 659.25, duration: 0.6 },  // E
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 659.25, duration: 0.4 },  // E
+    { note: 587.33, duration: 0.2 },  // D
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 493.88, duration: 0.4 },  // B
+    { note: 493.88, duration: 0.2 },  // B
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 587.33, duration: 0.4 },  // D
+    { note: 659.25, duration: 0.4 },  // E
+    { note: 523.25, duration: 0.4 },  // C
+    { note: 440.00, duration: 0.4 },  // A
+    { note: 440.00, duration: 0.4 },  // A
+    { note: 0,      duration: 0.4 },  // 休符（長め）
+
+    // パートE（新しい展開部）
+    { note: 329.63, duration: 0.4 },  // E (低)
+    { note: 329.63, duration: 0.2 },  // E
+    { note: 392.00, duration: 0.2 },  // G
+    { note: 329.63, duration: 0.4 },  // E
+    { note: 329.63, duration: 0.2 },  // E
+    { note: 392.00, duration: 0.2 },  // G
+    { note: 440.00, duration: 0.4 },  // A
+    { note: 440.00, duration: 0.2 },  // A
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 493.88, duration: 0.4 },  // B
+    { note: 440.00, duration: 0.2 },  // A
+    { note: 392.00, duration: 0.2 },  // G
+    { note: 329.63, duration: 0.6 },  // E
+    { note: 392.00, duration: 0.2 },  // G
+    { note: 440.00, duration: 0.4 },  // A
+    { note: 493.88, duration: 0.4 },  // B
+    { note: 523.25, duration: 0.4 },  // C
+    { note: 392.00, duration: 0.4 },  // G
+    { note: 329.63, duration: 0.4 },  // E
+    { note: 329.63, duration: 0.4 },  // E
+    { note: 0,      duration: 0.2 },  // 休符
+
+    // パートF（クライマックス）
+    { note: 659.25, duration: 0.4 },  // E
+    { note: 659.25, duration: 0.2 },  // E
+    { note: 659.25, duration: 0.2 },  // E
+    { note: 523.25, duration: 0.4 },  // C
+    { note: 659.25, duration: 0.4 },  // E
+    { note: 783.99, duration: 0.8 },  // G
+    { note: 392.00, duration: 0.8 },  // G (低)
+    { note: 0,      duration: 0.4 },  // 休符
+
+    // パートG（フィナーレ - メインテーマの華やかなバージョン）
+    { note: 659.25, duration: 0.4 },  // E
+    { note: 493.88, duration: 0.2 },  // B
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 587.33, duration: 0.4 },  // D
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 493.88, duration: 0.2 },  // B
+    { note: 440.00, duration: 0.4 },  // A
+    { note: 440.00, duration: 0.2 },  // A
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 659.25, duration: 0.4 },  // E
+    { note: 587.33, duration: 0.2 },  // D
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 493.88, duration: 0.6 },  // B
+    { note: 523.25, duration: 0.2 },  // C
+    { note: 587.33, duration: 0.4 },  // D
+    { note: 659.25, duration: 0.4 },  // E
+    { note: 523.25, duration: 0.4 },  // C
+    { note: 440.00, duration: 0.4 },  // A
+    { note: 440.00, duration: 0.8 },  // A（ロング）
+    { note: 0,      duration: 0.4 }   // 休符（ループ前の間）
+];
 
 // ===================================
 // DOM要素の取得
@@ -65,6 +214,7 @@ const resetBtn = document.getElementById('reset-btn');
 const restartBtn = document.getElementById('restart-btn');
 const difficultySelect = document.getElementById('difficulty');
 const soundToggle = document.getElementById('sound-toggle');
+const bgmToggle = document.getElementById('bgm-toggle');
 
 // スコア表示要素
 const scoreElement = document.getElementById('score');
@@ -403,6 +553,9 @@ function gameOver() {
     gameOverOverlay.classList.remove('hidden');
     playSound('gameover');
     saveHighScore();
+
+    // BGMを停止
+    stopBGM();
 }
 
 // スコアを更新
@@ -507,6 +660,88 @@ function playTone(audioContext, frequency, volume, duration, waveType = 'sine') 
     oscillator.stop(audioContext.currentTime + duration);
 }
 
+// ===================================
+// BGM管理
+// ===================================
+
+/**
+ * BGMを開始
+ */
+function startBGM() {
+    if (!bgmEnabled) return;
+
+    stopBGM(); // 既存のBGMを停止
+
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    bgmNoteIndex = 0;
+
+    playNextBGMNote();
+}
+
+/**
+ * 次のBGM音符を再生
+ */
+function playNextBGMNote() {
+    if (!bgmEnabled || !audioContext) return;
+
+    const { note, duration } = BGM_MELODY[bgmNoteIndex];
+
+    bgmOscillator = audioContext.createOscillator();
+    bgmGainNode = audioContext.createGain();
+
+    bgmOscillator.type = 'square';
+    bgmOscillator.frequency.value = note;
+
+    bgmGainNode.gain.setValueAtTime(0, audioContext.currentTime);
+    bgmGainNode.gain.linearRampToValueAtTime(0.05, audioContext.currentTime + 0.01);
+    bgmGainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+
+    bgmOscillator.connect(bgmGainNode);
+    bgmGainNode.connect(audioContext.destination);
+
+    bgmOscillator.start(audioContext.currentTime);
+    bgmOscillator.stop(audioContext.currentTime + duration);
+
+    // 次の音符へ
+    bgmNoteIndex = (bgmNoteIndex + 1) % BGM_MELODY.length;
+
+    // 次の音符をスケジュール
+    setTimeout(() => {
+        if (bgmEnabled && gameRunning && !gamePaused) {
+            playNextBGMNote();
+        }
+    }, duration * 1000);
+}
+
+/**
+ * BGMを停止
+ */
+function stopBGM() {
+    if (bgmOscillator) {
+        try {
+            bgmOscillator.stop();
+        } catch (e) {
+            // 既に停止している場合のエラーを無視
+        }
+        bgmOscillator = null;
+    }
+    if (bgmGainNode) {
+        bgmGainNode = null;
+    }
+}
+
+/**
+ * BGMの有効/無効を切り替え
+ */
+function toggleBGM(enabled) {
+    bgmEnabled = enabled;
+    if (enabled && gameRunning && !gamePaused) {
+        startBGM();
+    } else {
+        stopBGM();
+    }
+}
+
 // ゲームループ
 function gameLoop() {
     if (!gameRunning || gamePaused) return;
@@ -536,6 +771,11 @@ function startGame() {
     startBtn.disabled = true;
     pauseBtn.disabled = false;
     difficultySelect.disabled = true;
+
+    // BGMを開始
+    if (bgmEnabled) {
+        startBGM();
+    }
 }
 
 // ゲーム一時停止
@@ -547,8 +787,14 @@ function pauseGame() {
 
     if (!gamePaused) {
         gameInterval = setInterval(gameLoop, dropSpeed);
+        // 再開時にBGMも再開
+        if (bgmEnabled) {
+            startBGM();
+        }
     } else {
         clearInterval(gameInterval);
+        // 一時停止時にBGMも停止
+        stopBGM();
     }
 }
 
@@ -557,6 +803,9 @@ function resetGame() {
     gameRunning = false;
     gamePaused = false;
     clearInterval(gameInterval);
+
+    // BGMを停止
+    stopBGM();
 
     init();
     drawBoard();
@@ -625,6 +874,10 @@ restartBtn.addEventListener('click', () => {
 
 soundToggle.addEventListener('change', (e) => {
     soundEnabled = e.target.checked;
+});
+
+bgmToggle.addEventListener('change', (e) => {
+    toggleBGM(e.target.checked);
 });
 
 // モバイルボタンイベント
